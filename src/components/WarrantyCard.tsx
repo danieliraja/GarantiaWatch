@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { StyleSheet, View, Image } from 'react-native';
 import { Button, Text, useTheme } from 'react-native-paper';
 import { useNavigation } from '@react-navigation/native';
@@ -21,11 +21,16 @@ const WarrantyCard: React.FC<Props> = ({ warranty }) => {
   const theme = useTheme();
   const navigation = useNavigation<NativeStackNavigationProp<AppStackParamList>>();
   const status = determineStatus(warranty);
+  const [imageError, setImageError] = useState(false);
 
   return (
     <View style={styles.card}>
-      {warranty.image_url ? (
-        <Image source={{ uri: warranty.image_url }} style={styles.image} />
+      {warranty.image_url && !imageError ? (
+        <Image
+          source={{ uri: warranty.image_url }}
+          style={styles.image}
+          onError={() => setImageError(true)}
+        />
       ) : (
         <View style={[styles.imagePlaceholder, { backgroundColor: theme.colors.surface }]}>
           <Text style={{ color: theme.colors.placeholder }}>Sem imagem</Text>

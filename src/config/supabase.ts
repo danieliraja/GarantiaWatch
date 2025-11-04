@@ -9,10 +9,22 @@ const supabaseUrl = extra?.supabaseUrl;
 const supabaseAnonKey = extra?.supabaseAnonKey;
 
 if (!supabaseUrl || !supabaseAnonKey) {
-  console.warn('Supabase credentials are missing. Please configure SUPABASE_URL and SUPABASE_ANON_KEY.');
+  const missingCredentials: string[] = [];
+
+  if (!supabaseUrl) {
+    missingCredentials.push('SUPABASE_URL');
+  }
+
+  if (!supabaseAnonKey) {
+    missingCredentials.push('SUPABASE_ANON_KEY');
+  }
+
+  throw new Error(
+    `Supabase credentials are missing. Please configure ${missingCredentials.join(' and ')} before running the app.`
+  );
 }
 
-export const supabase = createClient(supabaseUrl ?? '', supabaseAnonKey ?? '', {
+export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
   auth: {
     storage: AsyncStorage,
     autoRefreshToken: true,

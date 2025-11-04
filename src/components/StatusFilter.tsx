@@ -8,17 +8,21 @@ interface Props {
   onChange: (status: WarrantyStatus | 'todas') => void;
 }
 
+export const STATUS_FILTER_OPTIONS: Array<{
+  value: WarrantyStatus | 'todas';
+  label: string;
+}> = [
+  { value: 'todas', label: 'Todas' },
+  { value: 'ativa', label: 'Ativas' },
+  { value: 'vencendo', label: 'Vencendo' },
+  { value: 'vencida', label: 'Vencidas' }
+];
+
 const StatusFilter: React.FC<Props> = ({ current, onChange }) => {
-  const options: Array<{ value: WarrantyStatus | 'todas'; label: string }> = [
-    { value: 'todas', label: 'Todas' },
-    { value: 'ativa', label: 'Ativas' },
-    { value: 'vencendo', label: 'Vencendo' },
-    { value: 'vencida', label: 'Vencidas' }
-  ];
 
   return (
     <View style={styles.container}>
-      {options.map((option) => (
+      {STATUS_FILTER_OPTIONS.map((option) => (
         <Chip
           key={option.value}
           mode={current === option.value ? 'flat' : 'outlined'}

@@ -19,11 +19,21 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data }) => {
-      setSession(data.session);
-      setUser(data.session?.user ?? null);
-      setLoading(false);
-    });
+    const initializeSession = async () => {
+      try {
+        const { data } = await supabase.auth.getSession();
+        setSession(data.session);
+        setUser(data.session?.user ?? null);
+      } catch (error) {
+        console.error('AuthContext.getSession failed', { error });
+        setSession(null);
+        setUser(null);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    initializeSession();
 
     const { data: authListener } = supabase.auth.onAuthStateChange((_event, newSession) => {
       setSession(newSession);
@@ -39,6 +49,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const signIn = async (email: string, password: string) => {
     const { error } = await supabase.auth.signInWithPassword({ email, password });
     if (error) {
+      console.error('AuthContext.signIn failed', { email, error });
       throw error;
     }
   };
@@ -46,6 +57,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const signUp = async (email: string, password: string) => {
     const { error } = await supabase.auth.signUp({ email, password });
     if (error) {
+      console.error('AuthContext.signUp failed', { email, error });
       throw error;
     }
   };
@@ -53,6 +65,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const signOut = async () => {
     const { error } = await supabase.auth.signOut();
     if (error) {
+      console.error('AuthContext.signOut failed', { error });
       throw error;
     }
   };

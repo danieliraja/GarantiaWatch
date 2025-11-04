@@ -39,10 +39,33 @@ create table if not exists public.warranties (
   notification_id text,
   created_at timestamptz default timezone('utc', now())
 );
+
+alter table public.warranties enable row level security;
+
+create policy "Users can view their warranties"
+  on public.warranties
+  for select
+  using (auth.uid() = user_id);
+
+create policy "Users can insert their warranties"
+  on public.warranties
+  for insert
+  with check (auth.uid() = user_id);
+
+create policy "Users can update their warranties"
+  on public.warranties
+  for update
+  using (auth.uid() = user_id);
+
+create policy "Users can delete their warranties"
+  on public.warranties
+  for delete
+  using (auth.uid() = user_id);
 ```
 
-3. Habilite a Realtime na tabela `warranties`.
-4. Crie um bucket de Storage (por exemplo `warranty-images`) com política pública de leitura e gravação autenticada.
+3. As políticas acima garantem que cada usuário só leia e modifique seus próprios registros; ajuste os rótulos conforme a necessidade da sua organização, mas mantenha as expressões `auth.uid() = user_id` para preservar a segurança.
+4. Habilite a Realtime na tabela `warranties`.
+5. Crie um bucket de Storage (por exemplo `warranty-images`) com política pública de leitura e gravação autenticada.
 
 ## Variáveis de ambiente
 
